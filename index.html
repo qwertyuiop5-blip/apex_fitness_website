@@ -16,6 +16,7 @@
     <a onclick="showPage('workouts')">Workouts</a>
     <a onclick="showPage('bmi')">BMI</a>
     <a onclick="showPage('classes')">Classes</a>
+    <a onclick="showPage('progress')">Progress</a>
   </div>
 </nav>
 
@@ -116,6 +117,65 @@
     </div>
     <div class="day-tabs" id="day-tabs"></div>
     <div class="class-list" id="class-list"></div>
+  </div>
+</div>
+
+<!-- PROGRESS -->
+<div id="progress" class="page">
+  <div class="section-wrap">
+    <div class="section-header">
+      <div class="section-title">Weekly <span>Streak</span></div>
+      <div class="section-sub">Log your workouts and keep the streak alive</div>
+    </div>
+
+    <!-- Streak Stats -->
+    <div class="streak-stats">
+      <div class="streak-stat-card">
+        <div class="streak-stat-num" id="current-streak">0</div>
+        <div class="streak-stat-lbl">Current Streak 🔥</div>
+      </div>
+      <div class="streak-stat-card">
+        <div class="streak-stat-num" id="best-streak">0</div>
+        <div class="streak-stat-lbl">Best Streak 🏆</div>
+      </div>
+      <div class="streak-stat-card">
+        <div class="streak-stat-num" id="total-workouts">0</div>
+        <div class="streak-stat-lbl">Total Workouts 💪</div>
+      </div>
+    </div>
+
+    <!-- Week Grid -->
+    <div class="week-section">
+      <div class="week-label">This Week</div>
+      <div class="week-grid" id="week-grid"></div>
+    </div>
+
+    <!-- Log Workout -->
+    <div class="log-section">
+      <div class="week-label">Log a Workout</div>
+      <div class="log-card">
+        <div class="log-row">
+          <select id="log-workout-name">
+            <option value="">Select workout...</option>
+            <option>Full Body Blast</option>
+            <option>HIIT Cardio</option>
+            <option>Core Crusher</option>
+            <option>Upper Body Power</option>
+            <option>Yoga Flow</option>
+            <option>Leg Day</option>
+            <option>Morning Stretch</option>
+            <option>Sprint Intervals</option>
+          </select>
+          <input type="date" id="log-date">
+          <button class="btn-primary" onclick="logWorkout()">Log It</button>
+        </div>
+        <div id="log-msg" class="log-msg"></div>
+      </div>
+    </div>
+
+    <!-- History -->
+    <div class="week-label" style="margin-bottom:1rem">History</div>
+    <div id="workout-history"></div>
   </div>
 </div>
 
