@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ApexFit</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav>
+  <div class="logo">APEXFIT</div>
+  <div class="nav-links">
+    <a class="active" onclick="showPage('home')">Home</a>
+    <a onclick="showPage('workouts')">Workouts</a>
+    <a onclick="showPage('bmi')">BMI</a>
+    <a onclick="showPage('classes')">Classes</a>
+  </div>
+</nav>
+
+<!-- HOME -->
+<div id="home" class="page active">
+  <div class="home-bg"></div>
+  <div class="home-eyebrow">Your peak awaits</div>
+  <h1 class="home-title">Build Your<br><span>Best Self</span></h1>
+  <p class="home-sub">Workout plans, live classes, and BMI tracking — all in one place. No excuses.</p>
+  <div class="home-btns">
+    <button class="btn-primary" onclick="showPage('workouts')">Start Training</button>
+    <button class="btn-outline" onclick="showPage('bmi')">Check BMI</button>
+  </div>
+  <div class="home-stats">
+    <div>
+      <div class="home-stat-num">50+</div>
+      <div class="home-stat-lbl">Workout Plans</div>
+    </div>
+    <div>
+      <div class="home-stat-num">30+</div>
+      <div class="home-stat-lbl">Live Classes/Week</div>
+    </div>
+    <div>
+      <div class="home-stat-num">5</div>
+      <div class="home-stat-lbl">Difficulty Levels</div>
+    </div>
+  </div>
+</div>
+
+<!-- WORKOUTS -->
+<div id="workouts" class="page">
+  <div class="section-wrap">
+    <div class="section-header">
+      <div class="section-title">Workout <span>Plans</span></div>
+      <div class="section-sub">Choose your goal and get moving</div>
+    </div>
+    <div class="filter-row" id="workout-filters"></div>
+    <div class="workout-grid" id="workout-grid"></div>
+  </div>
+</div>
+
+<!-- BMI -->
+<div id="bmi" class="page">
+  <div class="section-wrap">
+    <div class="section-header">
+      <div class="section-title">BMI <span>Calculator</span></div>
+      <div class="section-sub">Body Mass Index is a simple screening tool</div>
+    </div>
+    <div class="bmi-layout">
+      <div class="bmi-inputs">
+        <div class="input-group">
+          <label>Weight</label>
+          <div class="input-slider-row">
+            <input type="range" id="weight-slider" min="30" max="200" value="70" oninput="syncBMI('weight',this.value)">
+            <div class="val-badge"><span id="weight-val">70</span> kg</div>
+          </div>
+        </div>
+        <div class="input-group">
+          <label>Height</label>
+          <div class="input-slider-row">
+            <input type="range" id="height-slider" min="120" max="220" value="175" oninput="syncBMI('height',this.value)">
+            <div class="val-badge"><span id="height-val">175</span> cm</div>
+          </div>
+        </div>
+        <div class="bmi-legend">
+          <div class="bmi-legend-title">BMI Categories</div>
+          <div class="bmi-legend-items">
+            <span class="dot green">●</span> Under 18.5 — Underweight<br>
+            <span class="dot gold">●</span> 18.5 – 24.9 — Normal<br>
+            <span class="dot orange">●</span> 25 – 29.9 — Overweight<br>
+            <span class="dot red">●</span> 30+ — Obese
+          </div>
+        </div>
+      </div>
+      <div class="bmi-result-card">
+        <div class="bmi-big" id="bmi-num">22.9</div>
+        <div class="bmi-cat-lbl" id="bmi-cat">Normal weight</div>
+        <div class="bmi-bar-wrap">
+          <div class="bmi-bar">
+            <div class="bmi-marker" id="bmi-marker" style="left:37%"></div>
+          </div>
+          <div class="bmi-range-labels">
+            <span>15</span><span>18.5</span><span>25</span><span>30</span><span>40</span>
+          </div>
+        </div>
+        <div class="bmi-tip" id="bmi-tip">Your BMI is within a healthy range. Keep up your current routine and focus on balanced nutrition.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CLASSES -->
+<div id="classes" class="page">
+  <div class="section-wrap">
+    <div class="section-header">
+      <div class="section-title">Class <span>Timetable</span></div>
+      <div class="section-sub">Book your spot before it fills up</div>
+    </div>
+    <div class="day-tabs" id="day-tabs"></div>
+    <div class="class-list" id="class-list"></div>
+  </div>
+</div>
+
+<!-- Workout Modal -->
+<div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="modal-box">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div id="modal-content"></div>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
