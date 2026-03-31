@@ -1,5 +1,5 @@
 /* ===== PAGE NAVIGATION ===== */
-const PAGES = ['home', 'workouts', 'bmi', 'classes'];
+const PAGES = ['home', 'workouts', 'bmi', 'classes', 'progress'];
 
 function showPage(id) {
   // Hide all pages
@@ -15,6 +15,7 @@ function showPage(id) {
   // Render page content on demand
   if (id === 'workouts') renderWorkouts();
   if (id === 'classes') renderClasses();
+  if (id === 'progress') renderProgress();
 }
 
 /* ===== WORKOUTS DATA ===== */
@@ -22,7 +23,7 @@ const workouts = [
   {
     id: 1,
     name: 'Full Body Blast',
-    img: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&q=80',
+    img: 'images/full-body-blast.jpg',
     category: 'Strength',
     difficulty: 'Beginner',
     duration: '30 min',
@@ -38,7 +39,7 @@ const workouts = [
   {
     id: 2,
     name: 'HIIT Cardio',
-    img: 'https://images.unsplash.com/photo-1549060279-7e168fcee0c2?w=600&q=80',
+    img: 'images/hiit-cardio.jpg',
     category: 'Cardio',
     difficulty: 'Intermediate',
     duration: '25 min',
@@ -54,7 +55,7 @@ const workouts = [
   {
     id: 3,
     name: 'Core Crusher',
-    img: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=600&q=80',
+    img: 'images/core-crusher.jpg',
     category: 'Core',
     difficulty: 'Intermediate',
     duration: '20 min',
@@ -70,7 +71,7 @@ const workouts = [
   {
     id: 4,
     name: 'Upper Body Power',
-    img: 'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=600&q=80',
+    img: 'images/upper-body-power.jpg',
     category: 'Strength',
     difficulty: 'Advanced',
     duration: '45 min',
@@ -87,7 +88,7 @@ const workouts = [
   {
     id: 5,
     name: 'Yoga Flow',
-    img: 'https://images.unsplash.com/photo-1545389336-cf090694435e?w=600&q=80',
+    img: 'images/yoga-flow.jpg',
     category: 'Flexibility',
     difficulty: 'Beginner',
     duration: '40 min',
@@ -103,7 +104,7 @@ const workouts = [
   {
     id: 6,
     name: 'Leg Day',
-    img: 'https://images.unsplash.com/photo-1574680096145-d05b474e2155?w=600&q=80',
+    img: 'images/leg-day.jpg',
     category: 'Strength',
     difficulty: 'Advanced',
     duration: '50 min',
@@ -119,7 +120,7 @@ const workouts = [
   {
     id: 7,
     name: 'Morning Stretch',
-    img: 'https://images.unsplash.com/photo-1506629082955-511b1aa562c8?w=600&q=80',
+    img: 'images/morning-stretch.jpg',
     category: 'Flexibility',
     difficulty: 'Beginner',
     duration: '15 min',
@@ -135,7 +136,7 @@ const workouts = [
   {
     id: 8,
     name: 'Sprint Intervals',
-    img: 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=600&q=80',
+    img: 'images/sprint-intervals.jpg',
     category: 'Cardio',
     difficulty: 'Advanced',
     duration: '30 min',
@@ -361,4 +362,143 @@ function bookClass(btn, name) {
   btn.style.color = '#1D9E75';
   btn.style.borderColor = 'rgba(29,158,117,0.4)';
   btn.disabled = true;
+}
+
+/* ===== PROGRESS / STREAK TRACKER ===== */
+
+// Load saved workouts from localStorage, fallback to empty array
+let workoutLog = JSON.parse(localStorage.getItem('apexfit-log') || '[]');
+
+function saveLog() {
+  localStorage.setItem('apexfit-log', JSON.stringify(workoutLog));
+}
+
+function renderProgress() {
+  renderWeekGrid();
+  renderStats();
+  renderHistory();
+  // Set today's date as default in date picker
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('log-date').value = today;
+  document.getElementById('log-msg').textContent = '';
+}
+
+/* Build the Mon–Sun grid for the current week */
+function renderWeekGrid() {
+  const grid = document.getElementById('week-grid');
+  const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  const today = new Date();
+  // Get Monday of the current week
+  const dayOfWeek = (today.getDay() + 6) % 7; // 0=Mon
+  const monday = new Date(today);
+  monday.setDate(today.getDate() - dayOfWeek);
+
+  grid.innerHTML = dayNames.map((name, i) => {
+    const date = new Date(monday);
+    date.setDate(monday.getDate() + i);
+    const dateStr = date.toISOString().split('T')[0];
+    const isToday = dateStr === today.toISOString().split('T')[0];
+    const done = workoutLog.some(e => e.date === dateStr);
+    return `
+      <div class="week-day ${done ? 'done' : ''} ${isToday ? 'today' : ''}">
+        <div class="day-name">${name}</div>
+        <div class="day-dot"></div>
+      </div>
+    `;
+  }).join('');
+}
+
+/* Calculate and display streak + total stats */
+function renderStats() {
+  const dates = [...new Set(workoutLog.map(e => e.date))].sort();
+  const total = workoutLog.length;
+
+  // Current streak — count consecutive days ending today or yesterday
+  let current = 0;
+  const today = new Date();
+  let check = new Date(today);
+  // allow streak if worked out today or yesterday
+  while (true) {
+    const str = check.toISOString().split('T')[0];
+    if (dates.includes(str)) {
+      current++;
+      check.setDate(check.getDate() - 1);
+    } else {
+      // allow one gap for "today not yet logged"
+      if (current === 0) {
+        check.setDate(check.getDate() - 1);
+        const y = check.toISOString().split('T')[0];
+        if (dates.includes(y)) { current++; check.setDate(check.getDate() - 1); }
+        else break;
+      } else break;
+    }
+  }
+
+  // Best streak ever
+  let best = 0, run = 0;
+  for (let i = 0; i < dates.length; i++) {
+    if (i === 0) { run = 1; }
+    else {
+      const prev = new Date(dates[i - 1]);
+      const curr = new Date(dates[i]);
+      const diff = (curr - prev) / (1000 * 60 * 60 * 24);
+      run = diff === 1 ? run + 1 : 1;
+    }
+    if (run > best) best = run;
+  }
+
+  document.getElementById('current-streak').textContent = current;
+  document.getElementById('best-streak').textContent = best;
+  document.getElementById('total-workouts').textContent = total;
+}
+
+/* Render workout history list, newest first */
+function renderHistory() {
+  const el = document.getElementById('workout-history');
+  if (workoutLog.length === 0) {
+    el.innerHTML = '<div class="no-history">No workouts logged yet. Log your first one above!</div>';
+    return;
+  }
+  const sorted = [...workoutLog].sort((a, b) => b.date.localeCompare(a.date));
+  el.innerHTML = sorted.map((entry, i) => `
+    <div class="history-item">
+      <div class="history-date">${formatDate(entry.date)}</div>
+      <div class="history-name">${entry.workout}</div>
+      <button class="history-delete" onclick="deleteLog(${entry.id})" title="Remove">✕</button>
+    </div>
+  `).join('');
+}
+
+/* Log a new workout entry */
+function logWorkout() {
+  const name = document.getElementById('log-workout-name').value;
+  const date = document.getElementById('log-date').value;
+  const msg = document.getElementById('log-msg');
+
+  if (!name) { msg.style.color = '#e24b4a'; msg.textContent = 'Please select a workout.'; return; }
+  if (!date) { msg.style.color = '#e24b4a'; msg.textContent = 'Please pick a date.'; return; }
+
+  workoutLog.push({ id: Date.now(), workout: name, date });
+  saveLog();
+  msg.style.color = '#1D9E75';
+  msg.textContent = `✓ ${name} logged for ${formatDate(date)}!`;
+  document.getElementById('log-workout-name').value = '';
+  renderWeekGrid();
+  renderStats();
+  renderHistory();
+}
+
+/* Delete a log entry by id */
+function deleteLog(id) {
+  workoutLog = workoutLog.filter(e => e.id !== id);
+  saveLog();
+  renderWeekGrid();
+  renderStats();
+  renderHistory();
+}
+
+/* Format date string to e.g. "Mon 31 Mar" */
+function formatDate(str) {
+  const d = new Date(str + 'T00:00:00');
+  return d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
 }
